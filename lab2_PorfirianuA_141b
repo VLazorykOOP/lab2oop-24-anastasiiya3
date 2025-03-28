@@ -1,0 +1,91 @@
+                                     Завдання 1
+#include <iostream>
+
+int main() {
+    int a, b, c, d;
+    std::cout << "Введіть значення a: ";
+    std::cin >> a;
+    std::cout << "Введіть значення b: ";
+    std::cin >> b;
+    std::cout << "Введіть значення c: ";
+    std::cin >> c;
+    std::cout << "Введіть значення d: ";
+    std::cin >> d;
+
+    // Обчислення виразу з використанням побітових операцій
+    int result = ((200 * a + 312 * c) >> 4) - (d * 120) + (c * 124);
+
+    // Виведення результату
+    std::cout << "Результат: " << result << std::endl;
+
+    return 0;
+}
+                                Завдання 2 
+#include <iostream>
+#include <string>
+#include <bitset>
+#include <vector>
+#include <cstdint>  // Додано для uint16_t
+
+using namespace std;
+
+// Функція для обчислення біта парності
+bool calculateParityBit(uint16_t word) {
+    bool parity = 0;
+    for (int i = 0; i < 15; ++i) {
+        if (word & (1 << i)) {
+            parity = !parity;
+        }
+    }
+    return parity;
+}
+
+// Функція для шифрування символу згідно з заданою структурою
+uint16_t encryptChar(char c, int position) {
+    uint16_t encrypted = 0;
+    
+    // Молодша частина ASCII (біти 0-3)
+    uint8_t lowerPart = c & 0x0F;
+    encrypted |= lowerPart;
+    
+    // Позиція символу (біти 4-10)
+    encrypted |= (position << 4);
+    
+    // Старша частина ASCII (біти 11-14)
+    uint8_t upperPart = (c >> 4) & 0x0F;
+    encrypted |= (upperPart << 11);
+    
+    // Біт парності (біт 15)
+    bool parity = calculateParityBit(encrypted);
+    encrypted |= (parity << 15);
+    
+    return encrypted;
+}
+
+int main() {
+    string input;
+    cout << "Введіть текст (до 128 символів): ";
+    getline(cin, input);
+    
+    // Доповнення пробілами до 128 символів
+    if (input.length() < 128) {
+        input.append(128 - input.length(), ' ');
+    } else if (input.length() > 128) {
+        input = input.substr(0, 128);
+    }
+    
+    // Шифрування кожного символу
+    vector<uint16_t> encryptedData;
+    for (int i = 0; i < input.length(); ++i) {
+        encryptedData.push_back(encryptChar(input[i], i));
+    }
+    
+    // Вивід результатів
+    cout << "\nРезультат шифрування:\n";
+    for (size_t i = 0; i < encryptedData.size(); ++i) {
+        cout << "Символ '" << input[i] << "' (позиція " << i << "): ";
+        cout << bitset<16>(encryptedData[i]) << " (0x" << hex << encryptedData[i] << dec << ")\n";
+    }
+    
+    return 0;
+}
